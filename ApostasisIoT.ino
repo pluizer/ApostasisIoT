@@ -28,7 +28,7 @@ const char LispLibrary[] =
 "(let ((str (read-line s)))"
 "(func (parse-int (subseq str 9 (- (length str) 1)))))"
 "(terpri))))"
-"(wifi-connect \"righard\" \"kakkerlak1880\")";
+"(wifi-connect \"SSID\" \"PASSWORD\")";
 
 
 /* uLisp ESP Version 2.5c - www.ulisp.com
