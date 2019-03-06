@@ -39,8 +39,18 @@ const char LispLibrary[] =
 "(let ((str (read-line s)))"
 "(func (parse-int (subseq str 9 (- (length str) 1)))))"
 "(terpri))))"
+"(defun measure ()"
+"(pinmode 0 t)"
+"(pinmode 4 nil)"
+"(digitalwrite 0 nil)"
+"(delay 2)"
+"(digitalwrite 0 t)"
+"(delay 10)"
+"(digitalwrite 0 nil)"
+"(let* ((duration (pulse-in 4 t))"
+"(distance (/ (/ duration 2) 29)))"
+"distance))"
 "(wifi-connect \"SSID\" \"PASSWORD\")";
-
 
 // Compile options
 
