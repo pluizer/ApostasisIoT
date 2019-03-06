@@ -123,7 +123,7 @@ PRINCTOSTRING, PRIN1TOSTRING, LOGAND, LOGIOR, LOGXOR, LOGNOT, ASH, LOGBITP, EVAL
 MAKUNBOUND, BREAK, READ, PRIN1, PRINT, PRINC, TERPRI, READBYTE, READLINE, WRITEBYTE, WRITESTRING,
 WRITELINE, RESTARTI2C, GC, ROOM, SAVEIMAGE, LOADIMAGE, CLS, PINMODE, DIGITALREAD, DIGITALWRITE,
 ANALOGREAD, ANALOGWRITE, DELAY, MILLIS, SLEEP, NOTE, EDIT, PPRINT, PPRINTALL, AVAILABLE, WIFISERVER,
-WIFISOFTAP, CONNECTED, WIFILOCALIP, WIFICONNECT, PARSEINT, I2S, ENDFUNCTIONS };
+WIFISOFTAP, CONNECTED, WIFILOCALIP, WIFICONNECT, PARSEINT, I2S, PULSEIN, ENDFUNCTIONS };
 
 // Typedefs
 
@@ -3065,6 +3065,15 @@ object *fn_i2s (object* args, object* env) {
   String str = String(i);
   return lispstring(const_cast<char*>(str.c_str()));
 }
+
+object *fn_pulsein (object *args, object *env) {
+  (void) env;
+  int pin = integer(first(args));
+  object *mode = second(args);
+  if (integerp(mode)) return number(pulseIn(pin, mode->integer));
+  return number(pulseIn(pin, mode ? HIGH : LOW));
+}
+
 // Built-in procedure names - stored in PROGMEM
 
 const char string0[] PROGMEM = "symbols";
@@ -3250,6 +3259,8 @@ const char string179[] PROGMEM = "wifi-localip";
 const char string180[] PROGMEM = "wifi-connect";
 const char string181[] PROGMEM = "parse-int";
 const char string182[] PROGMEM = "i2s";
+const char string183[] PROGMEM = "pulsein";
+
 
 const tbl_entry_t lookup_table[] PROGMEM = {
   { string0, NULL, NIL, NIL },
@@ -3435,6 +3446,7 @@ const tbl_entry_t lookup_table[] PROGMEM = {
   { string180, fn_wificonnect, 0, 2 },
   { string181, fn_parseint, 1, 1 },
   { string182, fn_i2s, 1, 1 },
+  { string182, fn_pulsein, 2, 2 },
 };
 
 // Table lookup functions
