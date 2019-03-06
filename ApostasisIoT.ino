@@ -1,4 +1,15 @@
 
+/* uLisp ESP Version 2.5c - www.ulisp.com
+   David Johnson-Davies - www.technoblogy.com - 7th February 2019
+
+   Additions and modifictions made by:
+   
+   MAD Emergent Art Richard van Roy - March 2019
+   for the benefit of the Apostasis Project (apostasis.eu)
+
+   Licensed under the MIT license: https://opensource.org/licenses/MIT
+*/
+
 const char LispLibrary[] =
 "(defun println (x s) (princ x s) (princ #\\return s) (princ #\\newline s))"
 "(defun set-value (key value password)"
@@ -30,12 +41,6 @@ const char LispLibrary[] =
 "(terpri))))"
 "(wifi-connect \"SSID\" \"PASSWORD\")";
 
-
-/* uLisp ESP Version 2.5c - www.ulisp.com
-   David Johnson-Davies - www.technoblogy.com - 7th February 2019
-
-   Licensed under the MIT license: https://opensource.org/licenses/MIT
-*/
 
 // Compile options
 
