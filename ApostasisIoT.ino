@@ -13,7 +13,7 @@
 const char LispLibrary[] =
 "(defun println (x s) (princ x s) (princ #\\return s) (princ #\\newline s))"
 "(defun set-value (key value password)"
-"(let ((str (concatenate 'string \"password=\" password \"&key=\" key \"&value=\" (i2svalue))))"
+"(let ((str (concatenate 'string \"password=\" password \"&key=\" key \"&value=\" (i2s value))))"
 "(princ (length str))"
 "(with-client (s \"apostasis.eu\" 80)"
 "(println \"POST /DesktopModules/InterconnectionFrameworkModule/API/restv1/D1654A27-5fb6-4f6A-986B-979170BD05C8/cwrite/i HTTP/1.1\" s)"
