@@ -115,3 +115,126 @@
     #+END_SRC
     
     will still evaluate to ~5~.
+    
+*** Variables
+**** Let expressions
+
+    Variables can be bounded to symbols using ~let~. An example paints a thousand words:
+
+    #+BEGIN_SRC lisp
+    (let ((a 5) (+ a 3)))
+    ;;     ^       ^
+    ;;     |-------------- here the value 5 is bounded to the symbol: a
+    ;;             |------ here, a, stands for, 5, so this coded becomes
+    (+ 5 3)
+    ;; which evaluates to
+    8
+    #+END_SRC
+    
+***** Exercise
+
+      Evaluate the following expressions by hand:
+      
+      #+BEGIN_SRC lisp
+      (let ((a 2)) a)
+      ;; ???
+
+      (let ((apple 12)) appel)
+      ;; ???
+
+      (let ((pear 222)) (+ pear pear))
+      ;; ???
+      #+END_SRC
+    
+**** Nesting _let expressions_
+    
+    A _let expression_ (which is how there are called) can contain other _let expressions_, this is called nesting. for example:
+
+
+    #+BEGIN_SRC lisp
+    (let ((a 5)) (let ((b 3)) (+ a b)))
+    ;;     ^            ^        ^ ^
+    ;;     |---------------------------- here a is bounded to 5
+    ;;                  |--------------- and b is bounded to 3
+    ;;                           |------ a, is 5 here
+    ;;                             |---- and b is 3
+    ;; so this code becomes
+    (+ 5 3)
+    ;; which still evaluates to
+    8
+    #+END_SRC
+
+    the value that is to be bound can also be an expression, for example:
+
+    #+BEGIN_SRC lisp
+    (let ((a (+ 2 3))) (+ a a))
+    ;; becomes
+    (let ((a 5)) (+ a a))
+    ;; becomes
+    (+ a a)
+    ;; becomes
+    10
+    #+END_SRC
+    
+    the value that is to be bound can also contain the symbol of a previously bound value:
+
+    #+BEGIN_SRC lisp
+    (let ((a (+ 2 3))) (let ((b (+ a a))) (+ a b)))
+    ;; becomes
+    (let ((a 5)) (let ((b (+ a a))) (+ a b)))
+    ;; becomes
+    (let ((b (+ 5 5))) (+ 5 b))
+    ;; becomes
+    (let ((b 10)) (+ 5 b))
+    ;; becomes
+    (+ 5 10)
+    ;; becomes
+    15
+    #+END_SRC
+
+***** Exercise
+
+      Evaluate the following expressions by hand:
+      
+      #+BEGIN_SRC lisp
+      (let ((a 1)) (let ((b 2)) (+ a b)))
+      ;; ???
+      
+      (let ((a 1)) (let ((b (+ a 2))) (+ a b)))
+      ;; ???
+
+      (let ((a (+ 2 2))) (let ((b (+ a a))) (+ b b)))
+      ;; ???
+      #+END_SRC
+
+**** Shadowing    
+
+     When a nested let expressions contains a symbol that was already bound the this first binding will _shadow_ the first. That means that a symbol will evaluate to its most inner binding. The outer binding are not visible anymore. To show you:
+
+     #+BEGIN_SRC lisp
+     (let ((a 4)) (let ((a 3)) a))
+     ;;     ^---------------------- a, does not exist here yet
+     ;;                  |--------- here a, is sill bounded to 4
+     ;;                        |--- here a is bounded to 4, it shadows the a bounded to 3.
+     ;; so this expression becomes
+     3
+     #+END_SRC
+     
+     Some more examples ...
+     #+BEGIN_SRC lisp
+     (let ((a 3)) (let ((a a)) a))
+     ;; becomes
+     (let ((a 3)) a)
+     ;; becomes
+     3
+
+     (let ((a 3)) (let ((a (+ a a))) a))
+     ;; so,...
+     (let ((a 3)) (let ((a (+ a a))) a))
+     ;; becomes
+     (let ((a (+ 3 3))) a)
+     ;; becomes
+     (let ((a 6)) a)
+     ;; becomes
+     6
+     #+END_SRC
