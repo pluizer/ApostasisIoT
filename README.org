@@ -1,0 +1,9 @@
+* Apostasis and IoT
+
+** Preparing the device
+
+   To get started with connecting to the @postasis platform we must first prepare the device. This manual assumes you are using the ESP8266 compatible device. Other Internet-enabled Arduino’s or Arduino clones can be used but one must look up the documentation on how to get started oneself. A ESP8266 is recommended to keep the project and examples uniform and can be ordered quite cheaply. It has built-in Wi-Fi capabilities.
+
+   The first step is to add NodeMCU support to de Arduino IDE which this manual assumes is already installed on your pc.
+   
+   * Open the Arduino IDE, click on File → Preferences and paste the url: http://arduino.esp8266.com/stable/package_esp8266com_index.json into the Additional Boards Manager Urls.
