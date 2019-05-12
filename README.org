@@ -7,3 +7,5 @@
    The first step is to add NodeMCU support to de Arduino IDE which this manual assumes is already installed on your pc.
    
    * Open the Arduino IDE, click on File → Preferences and paste the url: http://arduino.esp8266.com/stable/package_esp8266com_index.json into the Additional Boards Manager Urls.
+     
+     [[images/01.png]]
