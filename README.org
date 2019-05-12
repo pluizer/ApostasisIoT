@@ -238,3 +238,66 @@
      ;; becomes
      6
      #+END_SRC
+     
+*TODO: Explain about setq and defun*
+
+** Reading pins and sensors
+
+   To read the value of a pin or sensor you use the built-in functions ~analogread~ and ~digitalread~. The first one reads the value of a sensor connected to a analog pin by measuring it's current. The second one either returns ~true~ if there is current running trough the pin or else ~false~ when there is none.
+
+   For example, connect a button to the board at pin ~5~.
+
+   *TODO: Create image on how to connect the button*
+
+   If you run the function ~(digitalread 5)~ it should return ~false~ if you did not press the button in the mean time and ~true~ when the button was pressed.
+
+** Connecting to @postasis
+
+*** Reading values
+
+   Now that you have some basics in Lisp it is time to make the connection to _@postasis_ The main way to connect to the _@postasis platform_ is by using the REST-api. The firmware uploaded to your board makes this very easy.
+   The first step is to create a _key_ inside of the platform. How to do this is outside of the scope of this lesson, I like to refer to the _@postasis framework_ documentation to learn how to do this.
+   Values can be written to a key and they can be read from a key. It is like a variable in Processing (and lisp) but it's state is shared between other projects and Arduino's connected to _@postasis_.
+
+   * All keys inside _@postasis_ need a password. For demonstration purpouses a key has been created called ~button~ with the password ~1234567~. 
+
+   To read values associated to keys we use the ~read-value~ function. It takes the name of the key as argument. For example, to read the value currently associated to the key ~button~ we'd use ~(read-value "button")~.
+
+*** Writing values
+
+    Values can be written to in the same way using the ~set-value~ function. To write a value we need to also supply the password. For example to _write_ a new value (in this case ~42~) to the key ~button~ we'd use ~(set-value "button" 42 "1234567")~.
+
+*** Connecting it all together
+
+    Using all this information it is time to connect a button to the _@postasis framework_ using this code
+   
+
+    #+BEGIN_SRC lisp
+    ;; Sets the key and password to use in the Apostasis Framework
+    (defvar *key* "button")
+    (defvar *password* "1234567")
+    ;; Sets the pin the where the button is connected to on the Arduino
+    (defvar *button-pin* 5)
+    
+    ;; Sets the button pin to be an input
+    (pinmode *button-pin* nil)
+    
+    ;; Aux function for toggle-and-set
+    (defun -toggle (v)
+    (if (eq v 1) 0 1))
+    
+    ;; Switches the value of "button" between 0 and 1
+    (defun toggle-and-set (v key password)
+    (set-value *key* (-toggle v) *password*))
+    
+    ;; Keep running this loop
+    (defun main-loop ()
+    ;; Wait a tenth of a second
+    (delay 100)
+    ;; When button is pressed toggle the "button" value on the
+    ;; Apostasis Framework
+    (when (digitalread *button-pin*)
+    (read-value *key* toggle-and-set))
+    (main-loop))
+    #+END_SRC
+     
