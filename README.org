@@ -2,7 +2,7 @@
 
 ** Preparing the device
 
-   To get started with connecting to the @postasis platform we must first prepare the device. This manual assumes you are using the ESP8266 compatible device. Other Internet-enabled Arduino’s or Arduino clones can be used but one must look up the documentation on how to get started oneself. A ESP8266 is recommended to keep the project and examples uniform and can be ordered quite cheaply. It has built-in Wi-Fi capabilities.
+   To get started with connecting to the _@postasis platform_ we must first prepare the device. This manual assumes you are using the ESP8266 compatible device. Other Internet-enabled Arduino’s or Arduino clones can be used but one must look up the documentation on how to get started oneself. A ESP8266 is recommended to keep the project and examples uniform and can be ordered quite cheaply. It has built-in Wi-Fi capabilities.
 
    The first step is to add NodeMCU support to de Arduino IDE which this manual assumes is already installed on your pc.
    
@@ -24,4 +24,94 @@
 
    * Compile and upload the project [[images/03.png]]
 
-   At this point the board is ready to connect to the @postasis platform.
+   At this point the board is ready to connect to the _@postasis platform_.
+   
+** Live coding in Lisp
+
+   [[images/04.png]]
+
+   Normally we program an Arduino by writing Processing code in the IDE and then uploading it to the board. This takes some time and when exploring and playing with code this can get tedious. Luckily, after having uploaded the firmware in previous steps, the board now comes with the capability to be programmed while running in a language called Lisp (uLisp in this case). A simple way to do so is to make sure the board is connected to the computer and open the serial console with Ctrl+Shift+M.
+   It is now possible to enter Lisp code and have it evaluated immediately. Go ahaid and enter "Hello world" in the console to see if it works.
+   Lisp is an easy language to learn, here are the basics:
+   
+** Values and Functions
+*** Values
+
+    Clojure's _reader_ reads code, called an _expression_ and than returns its value. Reading expressions and than and returning its value is called; _evaluating_ that expression. The most simple expression possible are just _values_ which evaluate to them self.
+
+    For example for numbers:
+
+    ~12~ evaluates to ~12~ and ~3.14~ evaluates to ~3.14~.
+
+*** Functions calls
+    
+    An expression can also stand between parentheses, this is called a list, for example:
+
+    #+BEGIN_SRC lisp
+    (+ 12 3.14)
+    #+END_SRC
+    
+    When Lisp's reader encounters such an expression it considers the first item of the list to evaluate to a function (more on functions later). In the last example ~+~ evaluates to a function that returns the _sum_ of its _arguments_.
+    
+    Everything but the first item of a list are the arguments that go in that function. Arguments are the values that the functions takes to do its work. In this example to arguments for the function ~+~ are ~12~ and ~3.14~.
+
+    This expression than evaluates to the sum of its arguments. So ~(+ 12 3.14)~ evaluates to ~15.34~. 
+    
+    These lists (where the first item of the list evaluates to a function and the rest to its arguments) are called _function calls_.
+
+    If one of the items of such a _function call_ is itself a function call the last one is evaluated first. So for example:
+
+    #+BEGIN_SRC lisp
+    (+ (+ 2 3) 4)
+    #+END_SRC
+    is first evaluated to
+    #+BEGIN_SRC lisp
+    (+ 5 4)
+    #+END_SRC
+    and lastly to:
+    #+BEGIN_SRC lisp
+    9
+    #+END_SRC
+
+    another example:
+    #+BEGIN_SRC lisp
+    (+ (+ 2 (+ 1 1)) (+ 3 4))
+    #+END_SRC
+    becomes ...
+    #+BEGIN_SRC lisp
+    (+ (+ 2 2) 7)
+    #+END_SRC
+    becomes ...
+    #+BEGIN_SRC lisp
+    (+ 4 7) 
+    #+END_SRC
+    and finally becomes ...
+    #+BEGIN_SRC lisp
+    13
+    #+END_SRC
+    
+**** Exercise
+
+     Evaluate the following expressions by hand:
+
+    #+BEGIN_SRC lisp
+    (+ 1 2)
+    #+END_SRC
+    
+    #+BEGIN_SRC lisp
+    (+ (+ 2 3) 2)
+    #+END_SRC
+     
+    #+BEGIN_SRC lisp
+    (+ (+ 2 3) 2 (+ 2 2))
+    #+END_SRC
+    
+*** Comments    
+
+    Anywhere the reader encounters text preceded by one or more semicolons (~;~) anything following it until the end of the line will be ignored. This is used to add human readable comments to code. For example:
+
+    #+BEGIN_SRC lisp
+    (+ 2 3) ;; this part will be ignored
+    #+END_SRC
+    
+    will still evaluate to ~5~.
