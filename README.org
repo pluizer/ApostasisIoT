@@ -9,3 +9,19 @@
    * Open the Arduino IDE, click on File → Preferences and paste the url: http://arduino.esp8266.com/stable/package_esp8266com_index.json into the Additional Boards Manager Urls.
      
      [[images/01.png]]
+     
+   * Close the window. Click Tools → Board → Board Manager and search for esp8266 and install it.
+
+     [[images/02.png]]
+
+   At this point the Arduino IDE is able to upload code to boards with an ESP8266 chip. To enable it navigate to Tools → Boards and select the board you are using. Now we are ready to upload the ApostasisIoT firmware. To do so;
+   
+   * Navigate to https://github.com/pluizer/ApostasisIoT and download and open the ArduinoIoT.ino file in the Arduino IDE.
+     
+   The firmware will try to connect to a WiFi access point. We must supply it with the name and password:
+   
+   * Change the line "(wifi-connect \"SSID\" \"PASSWORD\")"; with your correct SSID and PASSWORD of an available Wi-Fi access-point.
+
+   * Compile and upload the project [[images/03.png]]
+
+   At this point the board is ready to connect to the @postasis platform.
