@@ -1,8 +1,12 @@
 * Apostasis and IoT
-
+  
 [[images/05.png]]
 
-In this lesson you will learn how to connect IoT-devices to the _@postasis platform_ and to each other. 
+In this lesson you will learn how to connect Internet connected devices to the @postasis platform and to each other.
+
+** Overview
+
+[[images/06.png]]
 
 ** Preparing the device
 
@@ -275,6 +279,7 @@ In this lesson you will learn how to connect IoT-devices to the _@postasis platf
 
     Using all this information it is time to connect a button to the _@postasis framework_ using this code
    
+*** Connecting devices to the virtual space
 
     #+BEGIN_SRC lisp
     ;; Sets the key and password to use in the Apostasis Framework
@@ -305,3 +310,38 @@ In this lesson you will learn how to connect IoT-devices to the _@postasis platf
     (main-loop))
     #+END_SRC
      
+**** Via the REST API
+     
+     #+BEGIN_SRC csharp
+     using System.Collections;
+     using System.Collections.Generic;
+     using UnityEngine;
+     using Apostasis.Runtime;
+     using UnityOSC;
+     public class MyTestClass : ApostasisBehaviour{
+     
+         Light light;
+     
+         void Start() {
+             light = gameObject.GetComponent<Light>();
+             if (light == null) {
+                 Debug.Log("light is null");
+             }
+         }
+     
+         public ApostasisGlobalVariableReader globalReader;
+         public override void OnServerOscRecieved (OscMessage oscMessage) {
+             float v = oscMessage.GetFloat(0);
+             float i = (8.0f/1024.0f)*v;
+             light.intensity = i;
+             Debug.Log(i);
+     
+         }
+     }
+     #+END_SRC
+
+**** Via the OSC API
+     
+*** Connecting devices together
+
+
