@@ -1,5 +1,9 @@
 * Apostasis and IoT
 
+[[images/05.png]]
+
+In this lesson you will learn how to connect IoT-devices to the _@postasis platform_ and to each other. 
+
 ** Preparing the device
 
    To get started with connecting to the _@postasis platform_ we must first prepare the device. This manual assumes you are using the ESP8266 compatible device. Other Internet-enabled Arduino’s or Arduino clones can be used but one must look up the documentation on how to get started oneself. A ESP8266 is recommended to keep the project and examples uniform and can be ordered quite cheaply. It has built-in Wi-Fi capabilities.
