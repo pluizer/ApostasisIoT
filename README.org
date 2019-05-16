@@ -374,6 +374,8 @@ Now that you have some basics in Lisp it is time to make the connection to _@pos
 
     * Click on _add component_ and select _new script_.
 
+    [[images/16.png]]
+
     * Give a new to the script, we have used SensorReader.
 
     * Open the script and paste the following code:
@@ -416,13 +418,13 @@ Now that you have some basics in Lisp it is time to make the connection to _@pos
     * In the Arduino IDE open a new project and pate the following code:
 
      #+BEGIN_SRC C++
-     #include      <OSCMessage.h>
-     
+     #include <OSCMessage.h>
      #include <ESP8266WiFi.h>
      #include <WiFiUdp.h>
      #define OSC_PORT      9600
      #define LIGHT_SENSOR  A0
      #define LED_PIN       16
+     #define IP_ADDRESS    "192.168.0.100"
      
      WiFiUDP udp;
      
@@ -431,9 +433,6 @@ Now that you have some basics in Lisp it is time to make the connection to _@pos
        WiFi.begin("SSID", "PASSWORD");
        Serial.print("connecting ");
        while (WiFi.status() != WL_CONNECTED) {
-         digitalWrite(LED_PIN, HIGH);
-         delay(250);
-         digitalWrite(LED_PIN, LOW);
          delay(250);
          Serial.print(".");
        }
@@ -444,10 +443,7 @@ Now that you have some basics in Lisp it is time to make the connection to _@pos
      {
        Serial.print("settling ");
        for (int i=0; i<20; i++) {
-         digitalWrite(LED_PIN, HIGH);
-         delay(125);
-         digitalWrite(LED_PIN, LOW);
-         delay(125);
+         delay(250);
          Serial.print(".");
        }
        Serial.println(" done");
@@ -458,7 +454,7 @@ Now that you have some basics in Lisp it is time to make the connection to _@pos
        Serial.print("sending "); Serial.print(address); Serial.print("\n");
        OSCMessage msg(address);
        msg.add(value);
-       udp.beginPacket("192.168.0.100", OSC_PORT);
+       udp.beginPacket(IP_ADDRESS, OSC_PORT);
        msg.send(udp);
        udp.endPacket();
        msg.empty();
@@ -475,17 +471,22 @@ Now that you have some basics in Lisp it is time to make the connection to _@pos
      void loop()
      {
        int value = analogRead(LIGHT_SENSOR);
-       sendOsc("/psctest", value);
+       sendOsc("/light", value);
        delay(100);
      }
      #+END_SRC
       
+      This code will read the value of the sensor 10 times a second and send it directly to the virtual space server via OSC under the name "/light".
       
+      * Adjust the SSID and PASSWORD fields to that of your WiFi-hotspot.
 
+      * Change the value of IP_ADDRESS to that of the local IP-Address the server is running on.
+      
+      * Upload the project to the Arduino
 
-**** Connecting devices to the virtual space
+      * Now, like in the REST api, add a light to the scene and attach a new script to it. We call it MyTestClass in this example ...
 
-     [[images/08.png]]
+      * Open the script and paste the following code:
 
      #+BEGIN_SRC csharp
      using System.Collections;
@@ -495,25 +496,34 @@ Now that you have some basics in Lisp it is time to make the connection to _@pos
      using UnityOSC;
      public class MyTestClass : ApostasisBehaviour{
      
-         Light light;
+      Light light;
      
-         void Start() {
-             light = gameObject.GetComponent<Light>();
-             if (light == null) {
-                 Debug.Log("light is null");
-             }
-         }
+      void Start() {
+      light = gameObject.GetComponent<Light>();
+      if (light == null) {
+      Debug.Log("light is null");
+      }
+      }
      
-         public ApostasisGlobalVariableReader globalReader;
-         public override void OnServerOscRecieved (OscMessage oscMessage) {
-             float v = oscMessage.GetFloat(0);
-             light.intensity = i;
-             Debug.Log(i);
-     
-         }
+      public ApostasisGlobalVariableReader globalReader;
+      public override void OnServerOscRecieved (OscMessage oscMessage) {
+            float value = oscMessage.GetFloat(0);
+            float intensity = (10.0f / 1024.0f) * value;
+            light.intensity = intensity;
+      }
      }
      #+END_SRC
+      
+    With this code every time the Arduino sends a new message with the value of the light sensor, the intensity of the light is adjusted. 
+    
+    * Inside the inspector tell Unity to listen to the "/light" message via OSC
+
+     [[images/08.png]]
      
-*** Connecting devices together
+    * When starting the project press Escape and click on _connect_ in the OSC window.
+
+    [[images/17.png]]
+    
+    * The light should now react to the sensor.
 
 
