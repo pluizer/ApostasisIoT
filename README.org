@@ -45,10 +45,13 @@ In this lesson you will learn how to connect Internet connected devices to the @
    [[images/04.png]]
 
    Normally we program an Arduino by writing Processing code in the IDE and then uploading it to the board. This takes some time and when exploring and playing with code this can get tedious. Luckily, after having uploaded the firmware in previous steps, the board now comes with the capability to be programmed while running in a language called Lisp (uLisp in this case). A simple way to do so is to make sure the board is connected to the computer and open the serial console with Ctrl+Shift+M.
-   It is now possible to enter Lisp code and have it evaluated immediately. Go ahaid and enter "Hello world" in the console to see if it works.
-   Lisp is an easy language to learn, here are the basics:
-   
+   It is now possible to enter Lisp code and have it evaluated immediately. Go ahaid and enter ~"Hello world"~ in the console to see if it works. 
+   Let's try a simple function call, enter ~(+ 5 7)~ in the serial console and press enter. If the console prints the value ~12~ you are good to go!
+
 ** Values and Functions
+   
+   Lisp is an easy language to learn. To follow this tutorial you do not need to know the exact workings of the code, you could just follow along. If you do wish to learn a bit more about the language here is a little primer:
+ 
 *** Values
 
     Clojure's _reader_ reads code, called an _expression_ and than returns its value. Reading expressions and than and returning its value is called; _evaluating_ that expression. The most simple expression possible are just _values_ which evaluate to them self.
@@ -255,13 +258,29 @@ In this lesson you will learn how to connect Internet connected devices to the @
      
 *TODO: Explain about setq and defun*
 
-** Reading pins and sensors
+** Connecting a LED
 
+   Let's get started by connecting something to the Arduino. We'll simple by connecting a LED light.
+
+   Note that current will flow trough the breadboard like in the following image:
+
+   [[images/15.png]]
+
+	* Connect the 1KΩ resistor to pin 5 of the Arduino.
+	* Current flows from positive(+) to negative(-). If pin 5 is enabled we want it to flow trough the resistor then trough the led to the negative ground pin. A LED will only work in one direction, if it is placed the wrong way around it will block the current. We want the positive lead of the LED connected to the resistor and the negative to the ground. The positive lead of a LED is longer. So connect the longer lead to the resistor.
+	* Connect the other leg via a wire to the ground of the Arduino.
+	  
+	  
+   The final result should resemble this:
+   
+   [[images/14.png]]
+
+** Reading pins and sensors
+   
    To read the value of a pin or sensor you use the built-in functions ~analogread~ and ~digitalread~. The first one reads the value of a sensor connected to a analog pin by measuring it's current. The second one either returns ~true~ if there is current running trough the pin or else ~false~ when there is none.
 
    For example, connect a button to the board at pin ~5~.
 
-   *TODO: Create image on how to connect the button*
 
    If you run the function ~(digitalread 5)~ it should return ~false~ if you did not press the button in the mean time and ~true~ when the button was pressed.
 
