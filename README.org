@@ -267,7 +267,7 @@ In this lesson you will learn how to connect Internet connected devices to the @
    [[images/15.png]]
 
 	* Connect the 1KΩ resistor to pin 5 of the Arduino.
-	* Current flows from positive(+) to negative(-). If pin 5 is enabled we want it to flow trough the resistor then trough the led to the negative ground pin. A LED will only work in one direction, if it is placed the wrong way around it will block the current. We want the positive lead of the LED connected to the resistor and the negative to the ground. The positive lead of a LED is longer. So connect the longer lead to the resistor.
+	* Current flows from positive(+) to negative(-). If pin D5 is enabled we want it to flow trough the resistor then trough the led to the negative ground pin. A LED will only work in one direction, if it is placed the wrong way around it will block the current. We want the positive lead of the LED connected to the resistor and the negative to the ground. The positive lead of a LED is longer. So connect the longer lead to the resistor.
 	* Connect the other leg via a wire to the ground of the Arduino.
 	  
 	  
@@ -275,14 +275,39 @@ In this lesson you will learn how to connect Internet connected devices to the @
    
    [[images/14.png]]
 
+** Controlling the LED
+
+   To turn on the LED we must turn on pin 5 to which it is connected. To do so open the serial monitor in the Arduino IDE and type in the following:
+
+~(digitalwrite 14 1)~ 
+
+This will enable pin ~D5~ (pin D5 is 14 in Arduino, to get the names of other pins please refer to the manual that come with your controller) and if everything is working well the LED should go from off to on.
+
+To disable the LED again enter:
+
+~(digitalwrite 14 0)~
+
 ** Reading pins and sensors
    
    To read the value of a pin or sensor you use the built-in functions ~analogread~ and ~digitalread~. The first one reads the value of a sensor connected to a analog pin by measuring it's current. The second one either returns ~true~ if there is current running trough the pin or else ~false~ when there is none.
 
-   For example, connect a button to the board at pin ~5~.
-
-
    If you run the function ~(digitalread 5)~ it should return ~false~ if you did not press the button in the mean time and ~true~ when the button was pressed.
+
+   Connect a sensor, in this example we use a light sensor, to the Arduino like so:
+
+   [[images/10.png]]
+   
+   * Pin S on the sensor should go to pin A0 on the Arduino.
+   * Pin + on the sensor should go to VU.
+   * Pin - on the sensor should go to G.
+     
+   It is now possible to read the value of the light sensor with the command:
+
+   ~(analogread 4)~
+
+   (the ESP8266 has only one analog pin called ~A0~ and called ~4~ in Arduino)
+
+   This function should read the value from the light sensor returning a number between 0 and 1023, a higher number for more light.
 
 ** Connecting to @postasis
    
@@ -292,7 +317,7 @@ Now that you have some basics in Lisp it is time to make the connection to _@pos
 
 *** Via the REST API
      
-    The main way to connect to the _@postasis platform_ is by using the REST-api. Using this you can set the values of variables in the cloud. It is then possible for other to retrieve this value from other Arduino's or use it in the virtual space. This makes it a good way to connect your Arduino with those of others and to the virtual space.
+    Another way to connect to the _@postasis platform_ is by using the REST-api. Using this you can set the values of variables in the cloud. It is then possible for other to retrieve this value from other Arduino's or use it in the virtual space. This makes it a good way to connect your Arduino with those of others and to the virtual space.
 
     The firmware uploaded to your Arduino makes this very easy. The first step is to create a _key_ inside of the platform. How to do this is outside of the scope of this lesson, I like to refer to the _@postasis framework_ documentation to learn how to do this.
 
@@ -309,47 +334,154 @@ Now that you have some basics in Lisp it is time to make the connection to _@pos
     Values can be written to in the same way using the ~set-value~ function. To write a value we need to also supply the password. For example to _write_ a new value (in this case ~42~) to the key ~button~ we'd use ~(set-value "button" 42 "1234567")~.
 
 
-**** Connecting devices to the virtual space
+**** Connecting devices together
     
      [[images/09.png]]
+     
+     With the light sensor still connected to the Arduino we can read it's value each second and write is to the _@postasis platform_. 
+     
+     Open the serial monitor in the Arduino IDE and enter the following:
 
-**** Connecting it all together
+     #+BEGIN_SRC lisp
+     (defun main-loop ()
+       (delay 1000)
+       (set-value "light" (analogread 4) "1234567")
+       (main-loop))
+     #+END_SRC
+     
+     This will read the value of the sensor each second (1000 milliseconds) and send it to the "light" variable on the _@postasis platform_. 
+     
+     From another Arduino it is now possible to connect to this value and react to it. If you have another Arduino left please install the _ApostasisIoT_ firmware on it and connect the LED light to it light previously shown.
 
-    Using all this information it is time to connect a button to the _@postasis framework_ using this code
-   
-    #+BEGIN_SRC lisp
-    ;; Sets the key and password to use in the Apostasis Framework
-    (defvar *key* "button")
-    (defvar *password* "1234567")
-    ;; Sets the pin the where the button is connected to on the Arduino
-    (defvar *button-pin* 5)
-    
-    ;; Sets the button pin to be an input
-    (pinmode *button-pin* nil)
-    
-    ;; Aux function for toggle-and-set
-    (defun -toggle (v)
-    (if (eq v 1) 0 1))
-    
-    ;; Switches the value of "button" between 0 and 1
-    (defun toggle-and-set (v key password)
-    (set-value *key* (-toggle v) *password*))
-    
-    ;; Keep running this loop
-    (defun main-loop ()
-    ;; Wait a tenth of a second
-    (delay 100)
-    ;; When button is pressed toggle the "button" value on the
-    ;; Apostasis Framework
-    (when (digitalread *button-pin*)
-    (read-value *key* toggle-and-set))
-    (main-loop))
+     Instead of writing to the key ~light~ we are going to read it in a loop, open the open the serial monitor and type the following:
+
+     #+BEGIN_SRC lisp
+     (defun main-loop ()
+       (delay 1000)
+       (read-value "light" (lambda (v) (digitalwrite 14 (> 512 v))))
+       (main-loop))
+     #+END_SRC
+     
+     This will read the value of ~light~ in a loop. If this value is higher then 512 the LED will turn on and else it will turn off. When both Arduino's are powered on the LED of the Arduino will turn on if a bright light in shown on the other Arduino's sensor and will turn off if the sensor is put in the dark.
+     
+**** Connecting devices to the virtual space
+
+    Like connecting devices together it is also possible to connect a device to the virtual space of _@postasis_. We will give a basic example of how to connect the light sensor to the virtual space here, for further details refer to the _Apostasis User Manual_.
+
+    * Open the attached sample project in Unity and click add a light by right clicking in the _hierarchy_ selecting light -> spot light.
+      
+      We want this light to become bright if there is much light shown on the sensor and vice versa. To do so;
+
+    * Click on _add component_ and select _new script_.
+
+    * Give a new to the script, we have used SensorReader.
+
+    * Open the script and paste the following code:
+
+    #+BEGIN_SRC csharp
+    public class SensorReader: ApostasisBehaviour
+    {
+
+        Light light;
+
+        void Start() {
+            light = gameObject.GetComponent<Light>();
+            if (light == null) {
+                Debug.Log("light is null");
+            }
+            InvokeRepeating("GetValueFromServer", 0.0f, 1.0f);
+	}
+
+        void GetValueFromServer () {
+              ReadApostasisGlobalVariableInt (“light”, OnValueReceived, ApostasisGloablVariableOwner.ServerAndClient);
+	}
+
+	void OnValueReceived (int value) {
+            float intensity = (10.0f / 1024.0f) * value;
+            light.intensity = intensity;
+        }
+    }
     #+END_SRC
+    
+    This code will get the value of "light" from the server every second and changes the intensity of the light accordingly. The value of the sensor will be between 0 and 1023, we convert it to a value between 0 and 10.
+    Now when you start the client (@postasis -> Play as client) you can see that the light you have added reacts to the light sensor.
+
+
 *** Via the OSC API
 
-**** Reading values
+    Using the REST api it is easy to connect a sensor to the virtual space but there is lots of latency. It takes a while for the values to propagate. If a more realtime connection is wanted you can use the OSC method but the Arduino needs to be connected to the same network where the the virtual space server is running.
 
-**** Writing values
+    It is possible to connect a sensor directly to the server via normal Arduino code. For example, to read the value of the light sensor and send it via OSC:
+
+    * In the Arduino IDE open a new project and pate the following code:
+
+     #+BEGIN_SRC C++
+     #include      <OSCMessage.h>
+     
+     #include <ESP8266WiFi.h>
+     #include <WiFiUdp.h>
+     #define OSC_PORT      9600
+     #define LIGHT_SENSOR  A0
+     #define LED_PIN       16
+     
+     WiFiUDP udp;
+     
+     void connectToWifi()
+     {
+       WiFi.begin("SSID", "PASSWORD");
+       Serial.print("connecting ");
+       while (WiFi.status() != WL_CONNECTED) {
+         digitalWrite(LED_PIN, HIGH);
+         delay(250);
+         digitalWrite(LED_PIN, LOW);
+         delay(250);
+         Serial.print(".");
+       }
+       Serial.println(" done");
+     }
+     
+     void settle()
+     {
+       Serial.print("settling ");
+       for (int i=0; i<20; i++) {
+         digitalWrite(LED_PIN, HIGH);
+         delay(125);
+         digitalWrite(LED_PIN, LOW);
+         delay(125);
+         Serial.print(".");
+       }
+       Serial.println(" done");
+     }
+     
+     void sendOsc(const char* address, int value)
+     {
+       Serial.print("sending "); Serial.print(address); Serial.print("\n");
+       OSCMessage msg(address);
+       msg.add(value);
+       udp.beginPacket("192.168.0.100", OSC_PORT);
+       msg.send(udp);
+       udp.endPacket();
+       msg.empty();
+     }
+     
+     void setup()
+     {
+       Serial.begin(115200);
+       pinMode(LED_PIN, OUTPUT);
+       connectToWifi();
+       settle();
+     }
+     
+     void loop()
+     {
+       int value = analogRead(LIGHT_SENSOR);
+       sendOsc("/psctest", value);
+       delay(100);
+     }
+     #+END_SRC
+      
+      
+
 
 **** Connecting devices to the virtual space
 
