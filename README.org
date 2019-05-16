@@ -6,8 +6,6 @@ In this lesson you will learn how to connect Internet connected devices to the @
 
 ** Overview
 
-[[images/06.png]]
-
 ** Preparing the device
 
    To get started with connecting to the _@postasis platform_ we must first prepare the device. This manual assumes you are using the ESP8266 compatible device. Other Internet-enabled Arduino’s or Arduino clones can be used but one must look up the documentation on how to get started oneself. A ESP8266 is recommended to keep the project and examples uniform and can be ordered quite cheaply. It has built-in Wi-Fi capabilities.
@@ -260,10 +258,16 @@ In this lesson you will learn how to connect Internet connected devices to the @
    If you run the function ~(digitalread 5)~ it should return ~false~ if you did not press the button in the mean time and ~true~ when the button was pressed.
 
 ** Connecting to @postasis
+   
+[[images/06.png]]
 
-*** Reading values
+Now that you have some basics in Lisp it is time to make the connection to _@postasis_. It is possible to connect sensor data and other data to the virtual platform and other Arduino's.
 
-   Now that you have some basics in Lisp it is time to make the connection to _@postasis_ The main way to connect to the _@postasis platform_ is by using the REST-api. The firmware uploaded to your board makes this very easy.
+*** Via the REST API
+     
+**** Reading values
+
+    The main way to connect to the _@postasis platform_ is by using the REST-api. The firmware uploaded to your Arduino makes this very easy.
    The first step is to create a _key_ inside of the platform. How to do this is outside of the scope of this lesson, I like to refer to the _@postasis framework_ documentation to learn how to do this.
    Values can be written to a key and they can be read from a key. It is like a variable in Processing (and lisp) but it's state is shared between other projects and Arduino's connected to _@postasis_.
 
@@ -271,16 +275,39 @@ In this lesson you will learn how to connect Internet connected devices to the @
 
    To read values associated to keys we use the ~read-value~ function. It takes the name of the key as argument. For example, to read the value currently associated to the key ~button~ we'd use ~(read-value "button")~.
 
-*** Writing values
+**** Writing values
 
     Values can be written to in the same way using the ~set-value~ function. To write a value we need to also supply the password. For example to _write_ a new value (in this case ~42~) to the key ~button~ we'd use ~(set-value "button" 42 "1234567")~.
 
-*** Connecting it all together
+
+**** Connecting devices to the virtual space
+    
+    #+BEGIN_SRC csharp
+     ﻿using Apostasis.Runtime;
+     using UnityEngine;
+     
+     namespace Apostasis.DemoAssets
+     {
+         public class RichardCubeBehaviour : ApostasisBehaviour
+         {
+             public Animator m_Animator;
+             public ApostasisGlobalVariableReader m_ApostasisGlobalVariableReader;
+     
+             readonly int STATE_2_PARAM_ID = Animator.StringToHash("State2");
+     
+             // Update is called once per frame
+             protected override void OnServerUpdate()
+             {
+                 m_Animator.SetBool(STATE_2_PARAM_ID, m_ApostasisGlobalVariableReader.IntValue > 0);
+             }
+         }
+     }
+     #+END_SRC
+
+**** Connecting it all together
 
     Using all this information it is time to connect a button to the _@postasis framework_ using this code
    
-*** Connecting devices to the virtual space
-
     #+BEGIN_SRC lisp
     ;; Sets the key and password to use in the Apostasis Framework
     (defvar *key* "button")
@@ -309,9 +336,16 @@ In this lesson you will learn how to connect Internet connected devices to the @
     (read-value *key* toggle-and-set))
     (main-loop))
     #+END_SRC
-     
-**** Via the REST API
-     
+*** Via the OSC API
+
+**** Reading values
+
+**** Writing values
+
+**** Connecting devices to the virtual space
+
+     [[images/08.png]]
+
      #+BEGIN_SRC csharp
      using System.Collections;
      using System.Collections.Generic;
@@ -332,15 +366,12 @@ In this lesson you will learn how to connect Internet connected devices to the @
          public ApostasisGlobalVariableReader globalReader;
          public override void OnServerOscRecieved (OscMessage oscMessage) {
              float v = oscMessage.GetFloat(0);
-             float i = (8.0f/1024.0f)*v;
              light.intensity = i;
              Debug.Log(i);
      
          }
      }
      #+END_SRC
-
-**** Via the OSC API
      
 *** Connecting devices together
 
