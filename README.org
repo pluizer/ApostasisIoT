@@ -2,9 +2,17 @@
   
 [[images/05.png]]
 
-In this lesson you will learn how to connect Internet connected devices to the @postasis platform and to each other.
-
 ** Overview
+
+In this lesson you will learn how to connect Internet connected devices to the @postasis platform and to each other. To follow this lesson you will need:
+
+	* an Arduino or Arduino-clone with an ESP8266 chip. Other Internet enable Arduino's work also but the steps will be different.
+	* some sort of sensor, in this tutorial we'll use a light sensor
+	* a breadboard
+	* a 1KΩ resistor
+	* a computer with a working Arduino IDE.
+	  
+[[images/13.png]]
 
 ** Preparing the device
 
@@ -265,13 +273,15 @@ Now that you have some basics in Lisp it is time to make the connection to _@pos
 
 *** Via the REST API
      
-**** Reading values
+    The main way to connect to the _@postasis platform_ is by using the REST-api. Using this you can set the values of variables in the cloud. It is then possible for other to retrieve this value from other Arduino's or use it in the virtual space. This makes it a good way to connect your Arduino with those of others and to the virtual space.
 
-    The main way to connect to the _@postasis platform_ is by using the REST-api. The firmware uploaded to your Arduino makes this very easy.
-   The first step is to create a _key_ inside of the platform. How to do this is outside of the scope of this lesson, I like to refer to the _@postasis framework_ documentation to learn how to do this.
-   Values can be written to a key and they can be read from a key. It is like a variable in Processing (and lisp) but it's state is shared between other projects and Arduino's connected to _@postasis_.
+    The firmware uploaded to your Arduino makes this very easy. The first step is to create a _key_ inside of the platform. How to do this is outside of the scope of this lesson, I like to refer to the _@postasis framework_ documentation to learn how to do this.
 
    * All keys inside _@postasis_ need a password. For demonstration purpouses a key has been created called ~button~ with the password ~1234567~. 
+
+**** Reading values
+
+   Values can be written to a key and they can be read from a key. It is like a variable in Processing (and lisp) but it's state is shared between other projects and Arduino's connected to _@postasis_.
 
    To read values associated to keys we use the ~read-value~ function. It takes the name of the key as argument. For example, to read the value currently associated to the key ~button~ we'd use ~(read-value "button")~.
 
@@ -282,27 +292,7 @@ Now that you have some basics in Lisp it is time to make the connection to _@pos
 
 **** Connecting devices to the virtual space
     
-    #+BEGIN_SRC csharp
-     ﻿using Apostasis.Runtime;
-     using UnityEngine;
-     
-     namespace Apostasis.DemoAssets
-     {
-         public class RichardCubeBehaviour : ApostasisBehaviour
-         {
-             public Animator m_Animator;
-             public ApostasisGlobalVariableReader m_ApostasisGlobalVariableReader;
-     
-             readonly int STATE_2_PARAM_ID = Animator.StringToHash("State2");
-     
-             // Update is called once per frame
-             protected override void OnServerUpdate()
-             {
-                 m_Animator.SetBool(STATE_2_PARAM_ID, m_ApostasisGlobalVariableReader.IntValue > 0);
-             }
-         }
-     }
-     #+END_SRC
+     [[images/09.png]]
 
 **** Connecting it all together
 
